@@ -22,22 +22,32 @@ function buildHtml(
 ) {
   const script = getScript(mystery.slug);
 
-  // ── Host-only solution ──
-  const hostBrief = script
-    ? `
-    <section class="host">
-      <div class="warn">★ Host Only · Do Not Read Aloud ★</div>
-      <h2>The Solution</h2>
-      <p>${esc(script.hostNote)}</p>
-    </section>`
-    : "";
-
-  // ── How to run ──
+  // ── How to play (everyone is a player; the killer stays sealed) ──
   const howTo = script
     ? `
     <section class="run">
-      <h2>How to Run the Night</h2>
-      <ol>${script.howToRun.map((s) => `<li>${esc(s)}</li>`).join("")}</ol>
+      <h2>How to Play</h2>
+      <p class="run-intro">Everyone is a player — including the host. <strong>No one knows who the killer is</strong> until the very end, when the sealed Verdict (the last page) is opened together.</p>
+      <ol>
+        <li><strong>Set up.</strong> Print this pack and the Scene Map. Hand each guest only their own character sheet — never let anyone read another's secret. Keep the final sealed page folded and face-down.</li>
+        <li><strong>Open the night.</strong> Anyone may read the Opening narration aloud, then play through the rounds below.</li>
+        <li><strong>Investigate the rooms.</strong> Using the Scene Map (or the website), your party may search only <strong>as many rooms as there are players</strong>. Decide together where to look — some rooms hold evidence, others are decoys and dead ends.</li>
+        <li><strong>Accuse.</strong> After the final round, every player names who they believe did it, and why. Then vote.</li>
+        <li><strong>The Verdict.</strong> Only now does anyone break the seal on the last page — the killer is revealed to the whole table at once.</li>
+      </ol>
+    </section>`
+    : "";
+
+  // ── Sealed solution, printed last (open only at the verdict) ──
+  const sealedVerdict = script
+    ? `
+    <section class="host sealed">
+      <div class="warn">✱ Sealed · Open Only at the Verdict ✱</div>
+      <h2>The Verdict</h2>
+      <p class="say">${esc(script.reveal)}</p>
+      <h3 class="reveal-h">Why &amp; How</h3>
+      <p>${esc(script.hostNote)}</p>
+      <p class="seal-foot">Do not read this page until every player has made their accusation. The host is a player too — keep it folded and face-down until the end.</p>
     </section>`
     : "";
 
@@ -63,11 +73,10 @@ function buildHtml(
     ? `
     <section class="script">
       <div class="kicker">The Narrator's Script</div>
-      <h2>Opening</h2>
+      <h2>Opening — Read Aloud</h2>
       <p class="say">${esc(script.intro)}</p>
       ${rounds}
-      <h2 class="finale">The Reveal</h2>
-      <p class="say">${esc(script.reveal)}</p>
+      <p class="closing">After the final round, the table votes — then, and only then, break the seal on the last page for the Verdict.</p>
     </section>`
     : "";
 
@@ -135,6 +144,12 @@ function buildHtml(
 
   .run ol { padding-left: 22px; line-height: 1.7; font-size: 16px; }
   .run li { margin: 8px 0; }
+  .run-intro { font-size: 16px; line-height: 1.7; margin: 0 0 16px; }
+  .run-intro strong { color: #7a1010; }
+  .closing { margin-top: 18px; font-style: italic; color: #7a1010; }
+  .host.sealed { border-color: #7a1010; }
+  .reveal-h { font-family: "Special Elite", "Courier New", monospace; letter-spacing: 0.18em; text-transform: uppercase; font-size: 12px; color: #7a1010; margin: 18px 0 6px; }
+  .seal-foot { margin-top: 18px; font-style: italic; font-size: 13px; color: #6a5020; border-top: 1px dashed #8a6a30; padding-top: 12px; }
 
   .script .kicker { display: block; text-align: center; margin-bottom: 4px; }
   .script .say { line-height: 1.75; font-size: 17px; margin: 8px 0 16px; }
@@ -183,7 +198,6 @@ function buildHtml(
     </div>
   </div>
 
-  ${hostBrief}
   ${howTo}
   ${narrator}
 
@@ -196,5 +210,6 @@ function buildHtml(
   </div>
 
   ${sheets}
+  ${sealedVerdict}
 </div></body></html>`;
 }

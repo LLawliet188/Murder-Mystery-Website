@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useParty } from "@/lib/party-context";
 import { useRank, rankFor } from "@/lib/rank";
 import { openCluePack } from "@/lib/clue-pack";
+import { openMapPack } from "@/lib/map-pack";
 import {
   DIFFICULTY_LABEL,
   rankCasesForParty,
@@ -30,7 +31,7 @@ export function Dossier({ mystery }: { mystery: MysteryCase }) {
   const [fog, setFog] = useState(false);
   const [opened, setOpened] = useState(false);
   const [rankBump, setRankBump] = useState<string | null>(null);
-  const [showSolution, setShowSolution] = useState(false);
+  const [verdict, setVerdict] = useState<"sealed" | "confirm" | "revealed">("sealed");
   const kitRef = useRef<HTMLDivElement>(null);
 
   const range = Array.from({ length: mystery.playerMax - mystery.playerMin + 1 }, (_, i) => mystery.playerMin + i);
@@ -170,7 +171,15 @@ export function Dossier({ mystery }: { mystery: MysteryCase }) {
               <h2 className="mt-2 font-display fluid-h2 text-parchment">The Scene of the Crime</h2>
             </Reveal>
             <Reveal delay={0.08}>
-              <FloorPlanMap slug={mystery.slug} accent={mystery.palette.accent} />
+              <FloorPlanMap slug={mystery.slug} accent={mystery.palette.accent} budget={activeSize} />
+              <div className="mt-6 text-center">
+                <button
+                  onClick={() => openMapPack(mystery, activeSize)}
+                  className="rounded-full border border-gold/40 px-6 py-3 font-display text-sm uppercase tracking-[0.16em] text-gold transition-colors hover:border-gold hover:text-amber-glow"
+                >
+                  Download the Scene Map · PDF
+                </button>
+              </div>
             </Reveal>
           </div>
         </section>
@@ -273,8 +282,8 @@ export function Dossier({ mystery }: { mystery: MysteryCase }) {
                     <p className="font-type text-xs uppercase tracking-[0.24em] text-gold/70">The Case Is Open</p>
                     <h2 className="mt-2 font-display fluid-h2 text-parchment">Host&apos;s Kit</h2>
                     <p className="mt-3 max-w-2xl font-serif fluid-lead italic text-parchment-dim">
-                      You hold the master file. Print the dossiers, seal the invitations, and let no
-                      one know who you suspect.
+                      Everyone plays — including you. Print the sheets, hand each guest their own, and let
+                      the night judge itself. The killer&apos;s name stays sealed until the Verdict — even from you.
                     </p>
 
                     <ul className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -338,25 +347,51 @@ export function Dossier({ mystery }: { mystery: MysteryCase }) {
                           ))}
                         </div>
 
-                        <div className="mt-6">
-                          {!showSolution ? (
-                            <button
-                              onClick={() => setShowSolution(true)}
-                              data-sfx="reveal"
-                              className="rounded-full border border-crimson/50 px-6 py-3 font-display text-sm uppercase tracking-[0.16em] text-crimson-bright transition-colors hover:border-crimson hover:text-amber-glow"
-                            >
-                              Reveal the Solution — Spoiler
-                            </button>
-                          ) : (
-                            <motion.div
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              className="paper rounded-2xl border border-crimson/40 p-5 sm:p-6"
-                            >
-                              <p className="font-type text-[0.65rem] uppercase tracking-[0.18em] text-crimson-bright">Host only · The solution</p>
-                              <p className="mt-2 font-body leading-relaxed text-parchment">{script.hostNote}</p>
-                            </motion.div>
-                          )}
+                        <div className="mt-12 border-t border-crimson/20 pt-8">
+                          <p className="font-type text-xs uppercase tracking-[0.24em] text-crimson-bright/80">The Verdict</p>
+                          <h4 className="mt-2 font-display text-2xl text-parchment">Who Did It?</h4>
+                          <p className="mt-2 max-w-xl font-serif italic leading-relaxed text-smoke">
+                            Open this only at the very end — after every player has made their accusation. No one,
+                            not even you, should see it before then.
+                          </p>
+
+                          <div className="mt-5">
+                            {verdict === "sealed" && (
+                              <button onClick={() => setVerdict("confirm")} className="btn-seal rounded-full px-7 py-3.5 text-sm">
+                                Break the Seal
+                              </button>
+                            )}
+                            {verdict === "confirm" && (
+                              <div className="flex flex-wrap items-center gap-3">
+                                <span className="font-serif italic text-parchment-dim">Has every player accused? This reveals the killer.</span>
+                                <button
+                                  onClick={() => setVerdict("revealed")}
+                                  data-sfx="reveal"
+                                  className="rounded-full border border-crimson px-6 py-3 font-display text-sm uppercase tracking-[0.16em] text-crimson-bright transition-colors hover:text-amber-glow"
+                                >
+                                  Reveal the Killer
+                                </button>
+                                <button
+                                  onClick={() => setVerdict("sealed")}
+                                  className="rounded-full border border-smoke-dim/40 px-5 py-3 font-display text-sm uppercase tracking-[0.16em] text-smoke transition-colors hover:text-parchment"
+                                >
+                                  Not yet
+                                </button>
+                              </div>
+                            )}
+                            {verdict === "revealed" && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 12 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="paper rounded-2xl border border-crimson/40 p-5 sm:p-6"
+                              >
+                                <p className="font-type text-[0.65rem] uppercase tracking-[0.18em] text-crimson-bright">The Reveal</p>
+                                <p className="mt-2 font-serif text-lg italic leading-relaxed text-parchment">{script.reveal}</p>
+                                <p className="mt-4 font-type text-[0.65rem] uppercase tracking-[0.18em] text-crimson-bright">Why &amp; How</p>
+                                <p className="mt-2 font-body leading-relaxed text-parchment-dim">{script.hostNote}</p>
+                              </motion.div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     )}
