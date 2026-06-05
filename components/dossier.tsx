@@ -21,6 +21,7 @@ import { Reveal } from "./reveal";
 import { FogTransition } from "./fog-transition";
 import { FloorPlanMap } from "./floor-plan-map";
 import { getFloorPlan } from "@/lib/floorplans";
+import { getScript } from "@/lib/scripts";
 import { cn } from "@/lib/utils";
 
 export function Dossier({ mystery }: { mystery: MysteryCase }) {
@@ -29,6 +30,7 @@ export function Dossier({ mystery }: { mystery: MysteryCase }) {
   const [fog, setFog] = useState(false);
   const [opened, setOpened] = useState(false);
   const [rankBump, setRankBump] = useState<string | null>(null);
+  const [showSolution, setShowSolution] = useState(false);
   const kitRef = useRef<HTMLDivElement>(null);
 
   const range = Array.from({ length: mystery.playerMax - mystery.playerMin + 1 }, (_, i) => mystery.playerMin + i);
@@ -36,6 +38,7 @@ export function Dossier({ mystery }: { mystery: MysteryCase }) {
   const roster = rosterFor(mystery, activeSize);
   const outOfRange = size != null && !supportsParty(mystery, size);
   const plan = getFloorPlan(mystery.slug);
+  const script = getScript(mystery.slug);
 
   const openCase = () => {
     setFog(true);
@@ -300,6 +303,63 @@ export function Dossier({ mystery }: { mystery: MysteryCase }) {
                     <p className="mt-4 font-type text-xs text-smoke">
                       Includes character sheets for all {roster.length} suspects + a wax-sealed invitation.
                     </p>
+
+                    {script && (
+                      <div className="mt-12 border-t border-gold/15 pt-10">
+                        <p className="font-type text-xs uppercase tracking-[0.24em] text-gold/70">For the Host</p>
+                        <h3 className="mt-2 font-display text-2xl text-amber-glow">The Night, Round by Round</h3>
+
+                        <div className="paper hairline-gold mt-6 rounded-2xl p-5 sm:p-6">
+                          <p className="font-type text-[0.65rem] uppercase tracking-[0.18em] text-crimson-bright">Read aloud — the opening</p>
+                          <p className="mt-2 font-serif text-lg italic leading-relaxed text-parchment">{script.intro}</p>
+                        </div>
+
+                        <div className="mt-6 space-y-5">
+                          {script.rounds.map((r) => (
+                            <div key={r.name} className="glass rounded-2xl p-5 sm:p-6">
+                              <h4 className="font-display text-lg text-parchment">{r.name}</h4>
+                              <p className="mt-3 font-serif italic leading-relaxed text-parchment-dim">
+                                <span className="mr-2 font-type text-[0.58rem] uppercase tracking-[0.16em] text-crimson-bright">Read aloud</span>
+                                {r.narration}
+                              </p>
+                              <p className="mt-2 font-body text-sm leading-relaxed text-smoke">
+                                <span className="mr-2 font-type text-[0.58rem] uppercase tracking-[0.16em] text-gold/70">Host directs</span>
+                                {r.instructions}
+                              </p>
+                              <ul className="mt-3 space-y-1.5">
+                                {r.clues.map((c) => (
+                                  <li key={c} className="flex items-start gap-2 font-body text-sm text-parchment-dim">
+                                    <span className="mt-1 text-crimson-bright" aria-hidden>▸</span>
+                                    {c}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="mt-6">
+                          {!showSolution ? (
+                            <button
+                              onClick={() => setShowSolution(true)}
+                              data-sfx="reveal"
+                              className="rounded-full border border-crimson/50 px-6 py-3 font-display text-sm uppercase tracking-[0.16em] text-crimson-bright transition-colors hover:border-crimson hover:text-amber-glow"
+                            >
+                              Reveal the Solution — Spoiler
+                            </button>
+                          ) : (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              className="paper rounded-2xl border border-crimson/40 p-5 sm:p-6"
+                            >
+                              <p className="font-type text-[0.65rem] uppercase tracking-[0.18em] text-crimson-bright">Host only · The solution</p>
+                              <p className="mt-2 font-body leading-relaxed text-parchment">{script.hostNote}</p>
+                            </motion.div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>
