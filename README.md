@@ -25,11 +25,13 @@ The whole thing is styled like *a dimly lit detective's study at midnight*: cand
 ## ✦ Features
 
 - 🎭 **Mystery Matchmaker** — antique brass 3/4/5/6 tokens trigger a cinematic fog transition into a gallery ranked for your party size. A floating control changes party size anywhere.
+- 🕵️ **Ten complete, playable mysteries** — each case is a full game: a narrator's script, a three-round structure, a private dossier for every suspect (relationship · secret · alibi · what they say if accused), real clues, red herrings, and a solution. The culprit is always within the minimum roster, so every case is solvable at any supported party size.
+- 🔒 **Sealed, end-only verdict** — the host is a player too, so *no one* learns the killer until the Verdict. On-screen it's a two-step seal; in print it's the last, folded page.
+- 🚪 **Strategic room investigation** — an interactive crime-scene floor plan where your party may search only **as many rooms as there are players**. Choose wisely — some rooms hold evidence, others are dead ends. Searched rooms join an evidence log.
 - 🗂 **Case Files gallery** — 3D tilt cards that flip to reveal a dossier, filters by player count / difficulty / era / mood, a "Whisper" search, and a **Deal Me a Case** shuffle.
-- 📜 **Confidential dossiers** — wax seal, CLASSIFIED stamp, typewriter labels, a roster that adapts to your party, a gated **Host's Kit**, and a printable **Clue Pack** (generated client-side, no dependencies).
-- 🗺 **Interactive crime-scene floor plans** — every case has an illustrated SVG plan with glowing, clickable room hotspots that reveal spoiler-safe clues.
-- 🔊 **Atmosphere engine** — procedural ambience (a haunted-room drone + filtered rain) plus **synthesized interaction SFX** (hover, click, wax-seal, reveal). Gesture-gated, never autoplays, with a mute toggle. *File-ready:* drop real tracks into `/public/sounds` and they take over automatically.
-- 🌫 **Global FX layer** — film grain, vignette, drifting fog, floating embers & dust, and a candle/magnifying-glass cursor that reveals hidden clues.
+- 📄 **Printable host kit (no dependencies)** — a client-generated **Clue Pack** (how-to-play, narrator script, filled character sheets, wax-sealed invitation, sealed solution) and a **Scene Map** (rooms, corridor pathways, legend) — both print / save-as-PDF.
+- 🎻 **Noir atmosphere engine** — a synthesized, royalty-free mystery score (a slow minor-key motif) that fades in on first interaction, over a procedural ambient bed, plus synthesized UI sound effects (hover, click, wax-seal, reveal). Mute toggle; never autoplays on load. *File-ready:* drop real tracks into `/public/sounds` and they crossfade in.
+- 🌫 **Cinematic FX** — film grain, vignette, drifting fog, floating embers & dust, a 3D rotating hero key (R3F), 3D tilt cards, and a candle/magnifying-glass cursor that reveals hidden clues.
 - 🎖 **Detective Rank** — progress from Constable → Master Sleuth as you open cases, tracked in `localStorage`, with badges on the Detective's Guild page.
 - 📱 **Responsive & accessible** — mobile-first with fluid `clamp()` type, WebGL fallbacks, and full `prefers-reduced-motion` support.
 
@@ -47,6 +49,14 @@ The whole thing is styled like *a dimly lit detective's study at midnight*: cand
 | Neon Requiem | 4–6 | Master | Near-Future · Cyber-Noir |
 | A Knife at the Gala | 3–5 | Amateur | Modern · Glamour |
 | Carnival of Shadows | 4–6 | Hardened | 1930s · Eerie |
+
+## ✦ How a Game Runs
+
+1. **Gather** — pick how many are playing; the matchmaker ranks the cases that fit.
+2. **Set up** — open a case, download the Clue Pack and Scene Map. Each guest gets only their own character sheet (their secret, alibi, and agenda); the solution stays folded and sealed.
+3. **Play the rounds** — read the narrator's opening, then work through three rounds of narration, accusations, and clues.
+4. **Investigate** — on the floor plan, the party may search only as many rooms as there are players. Decide together — and mind the red herrings.
+5. **Accuse & deliver the Verdict** — everyone names a suspect and votes. Only then is the sealed solution opened, revealing the killer to the whole table at once — host included.
 
 ## ✦ Tech Stack
 
@@ -73,7 +83,7 @@ npm run start    # serve the production build
 
 The site is fully functional with no media files, but it's wired to upgrade the moment you add them:
 
-- **Music & SFX** — drop files into `/public/sounds/` (`theme-loop.mp3`, `click.mp3`, `hover.mp3`, `wax-seal.mp3`, `reveal.mp3`, `page-turn.mp3`). A real looping track crossfades over the procedural drone; file SFX replace the synth.
+- **Music & SFX** — drop files into `/public/sounds/` (`theme-loop.mp3`, `click.mp3`, `hover.mp3`, `wax-seal.mp3`, `reveal.mp3`, `page-turn.mp3`). A real looping track crossfades over the synthesized noir score; file SFX replace the synth.
 - **Cover art** — set `image: "/images/your-cover.jpg"` on any case in [`lib/cases.ts`](lib/cases.ts) to swap the procedural SVG cover for a photo (lazy-loaded with a palette blur-up).
 
 > Prefer royalty-free sources (Pixabay, Mixkit, Unsplash, Pexels). If you use CC-BY material, add a credits line.
@@ -83,7 +93,8 @@ The site is fully functional with no media files, but it's wired to upgrade the 
 ```
 app/            Routes: / · /cases · /cases/[slug] · /how-it-works · /guild
 components/     UI: hero scene, tilt cards, dossier, floor-plan map, atmosphere…
-lib/            Data & state: cases, floor plans, party + audio contexts, rank, clue packs
+lib/            Data & playable scripts, floor plans, party + audio contexts,
+                rank, and the clue-pack & scene-map (PDF) generators
 public/         Static assets (optional sounds/images go here)
 ```
 
