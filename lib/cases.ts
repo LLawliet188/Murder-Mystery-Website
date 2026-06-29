@@ -25,6 +25,7 @@ export interface MysteryCase {
   title: string;
   teaser: string;
   premise: string;
+  story: string;
   setting: string;
   victim: string;
   era: string;
@@ -51,6 +52,8 @@ export const CASES: MysteryCase[] = [
     teaser: "The patriarch lies dead in the locked library. Every heir had a reason.",
     premise:
       "Thunder splits the night over Ravensmoor Hall. When the storm knocks out the lights, the family gathers — and when they return, Lord Alistair is slumped over his will, the library bolted from within. The inheritance was about to change. Someone made sure it never would.",
+    story:
+      "Ravensmoor Hall has always sounded alive after midnight: pipes sighing behind the walls, portraits creaking in their frames, servants swearing they hear a cane in the west corridor long after Lord Alistair stopped using one. Tonight the whispers grew teeth. The new will was said to name a different heir, or perhaps no heir at all, and every guest arrived with a private grievance buttoned beneath formal black. During the blackout, glass broke somewhere no one can place, a bell rang in a room no one entered, and the family physician was seen wiping rain from gloves he claims never left the house. By dawn, the constable will come up the moor road. Until then, the dead man's house is judging everyone inside it.",
     setting: "A Gothic Victorian estate, candlelit and rain-lashed, its halls hung with watching portraits.",
     victim: "Lord Alistair Ravensmoor — the patriarch, found at his desk.",
     era: "Victorian",
@@ -84,6 +87,8 @@ export const CASES: MysteryCase[] = [
     teaser: "A luxury train, a snowbound pass, and one passenger who never reaches his cabin.",
     premise:
       "The Midnight Express carves through the white silence of the mountains, brass fittings gleaming. Somewhere between the dining car and Compartment Nine, a passenger vanishes from the living and reappears among the dead. The tracks are buried in snow. No one boarded. No one left.",
+    story:
+      "The train was late before it ever reached the pass, and by midnight the snow had swallowed the world so completely that the windows showed only ghosted reflections of the passengers. Henry Ashcombe dined politely, listened more than he spoke, and turned pale when the Contessa laughed at a joke no one else heard. Then came the tunnel: ninety seconds of dark, a scream softened by velvet, and a corridor suddenly full of people insisting they had not moved. Compartment Nine smells of cold air, Turkish tobacco, and a fear that began long before the journey. The timetable says the next stop is hours away. The murderer knows it, and so does everyone trapped beside them.",
     setting: "An art-deco sleeper carriage in the 1920s, snow blurring past frosted glass.",
     victim: "Henry Ashcombe — the man in Compartment Nine.",
     era: "1920s",
@@ -116,6 +121,8 @@ export const CASES: MysteryCase[] = [
     teaser: "Every face is hidden. So is every motive. The host falls at the stroke of midnight.",
     premise:
       "Beneath the gilded ceilings of a Venetian palazzo, masks turn and candlelight swims in the canal below. As the great clock strikes twelve, Il Padrone raises his glass to toast the new year — and crumples to the marble. No one saw a face. Everyone saw a chance.",
+    story:
+      "Venice has a talent for drowning truth. Tonight the palazzo floats on candlelight, perfume, and canal water black enough to swallow a confession. Giovanni Contarini invited enemies and called them friends, placed masks over faces already practiced at lying, and promised a revelation after the midnight toast. Before the clock finished striking, his crystal glass rang against the marble and the music stumbled into silence. A singer vanished between verses. A cardinal pocketed a note. A nameless harlequin bowed to a mirror that reflected no one clearly. Every guest insists the poison could have come from any hand, but Venice knows better: behind every mask is another mask, and one of them is smiling.",
     setting: "A candlelit Venetian ballroom of masks and mirrors, the canal lapping at the steps.",
     victim: "Giovanni Contarini — 'Il Padrone', the host.",
     era: "Baroque Venice",
@@ -149,6 +156,8 @@ export const CASES: MysteryCase[] = [
     teaser: "The jazz stops the instant the club owner is found behind his own bar.",
     premise:
       "The Velvet Note is the worst-kept secret in town — gin in the teacups, a cop at the door, and a song that never ends. Until it does. The band cuts out, the lights come up, and Lucky Marino is face-down behind the bar with his ledger missing. Everyone here owes someone. Tonight, somebody paid.",
+    story:
+      "The Velvet Note runs on three things: watered gin, borrowed jazz, and the understanding that nobody asks where the money goes after two in the morning. Lucky Marino kept the back room locked, the police paid, and every debt written in a ledger he treated like scripture. Tonight the password changed twice, the singer missed her cue, and a city councilman arrived through the alley instead of the front door. When the trumpet split a note and died, the club went quiet enough to hear ice settling in every glass. Lucky was behind the bar, his smile gone, his book gone, and the law already pounding upstairs. In this room, innocence costs more than whiskey.",
     setting: "A smoky Prohibition speakeasy, neon bleeding through the haze, a gramophone gone silent.",
     victim: "Sal 'Lucky' Marino — the club owner.",
     era: "Prohibition",
@@ -182,6 +191,8 @@ export const CASES: MysteryCase[] = [
     teaser: "The leading lady's final scene becomes her final breath — on a closed set.",
     premise:
       "On Soundstage 7, the cameras roll on the last shot of the year's biggest picture. 'Quiet on set,' calls the director. Then the spotlight catches Vivian Hart sinking to the floor, and this time it isn't acting. The doors were locked for the take. The only suspects are the ones who wanted her gone.",
+    story:
+      "Every lie in Hollywood looks better under a spotlight. Vivian Hart knew that better than anyone: she could cry on cue, love on cue, and destroy a rival with one smile at the commissary. The final scene was meant to save a bankrupt studio and make everyone rich enough to forgive one another. Instead, the locked soundstage became a cathedral of silence. The camera kept rolling after Vivian fell; on the film, someone whispers her real name, not the one on the poster. A missing script page, a prop gun no one admits touching, and a columnist's torn blackmail note suggest the murder began long before the director called action. The final cut belongs to whoever survives the edit.",
     setting: "A golden-age Hollywood soundstage, one hot spotlight, an abandoned clapperboard.",
     victim: "Vivian Hart — the leading lady.",
     era: "1950s Hollywood",
@@ -214,6 +225,8 @@ export const CASES: MysteryCase[] = [
     teaser: "Cut off by storm, the lighthouse keeper's logbook ends mid-sentence.",
     premise:
       "The supply boat won't return for a week, and the sea has turned to iron. High in the lantern room, the keeper's log breaks off in the middle of a word — and the keeper is gone, the great light still turning over an empty chair. Four souls remain on the rock. One of them stopped his pen.",
+    story:
+      "The island has no graveyard, only rocks where the sea takes what it is owed. Ezra Vane kept the light for twenty years and wrote everything down: the weather, the tides, the moods of the gulls, the names of ships that should never have been seen this far from shore. On the night he vanished, the lens turned red for three revolutions, the foghorn gave one note too many, and the log ended halfway through a warning. The relief keeper says the stairs were empty. Ezra's wife says the light skipped like a heartbeat. The mute supply boy points at the chapel door and trembles. Until the boat returns, every footstep on the tower stairs sounds like a confession.",
     setting: "A remote lighthouse on black cliffs, a churning sea, a single lantern turning in the dark.",
     victim: "Ezra Vane — the lighthouse keeper.",
     era: "Edwardian",
@@ -245,6 +258,8 @@ export const CASES: MysteryCase[] = [
     teaser: "A séance summons something far deadlier than a ghost.",
     premise:
       "Eight have gathered in Madame Seraphine's velvet parlor to reach beyond the veil — but the chairs were set for nine. As the planchette begins to move and the candles gutter low, the circle breaks with a scream. When the lights return, the patron sits cold at the head of the table, and the ninth chair is warm.",
+    story:
+      "Madame Seraphine promised only a voice from beyond the veil, but grief makes people generous and desperation makes them careless. Lord Wexley paid for a private sitting, then insisted on an extra chair and refused to say whose place it was. The parlor breathed with incense and damp velvet as the sitters joined hands. The planchette spelled a name no one wanted spoken. A bell rang under the table, the candles pinched themselves to blue, and in the darkness someone left the circle without letting go. When the lamps flared back, Wexley was dead and the ninth chair held the warmth of a body that had almost been there. The dead may be silent. The living are not.",
     setting: "A spiritualist's velvet parlor, guttering candles, a planchette frozen mid-glide.",
     victim: "Lord Wexley — the séance's patron, at the head of the table.",
     era: "Victorian",
@@ -278,6 +293,8 @@ export const CASES: MysteryCase[] = [
     teaser: "A tech mogul, murdered inside his own sealed, 'unhackable' smart-penthouse.",
     premise:
       "Two hundred floors above the rain, Adrian Kade built a fortress of glass and code that nothing could enter and nothing could leave without his word. At 3:03 a.m. the building's logs show every door sealed, every camera blind for ninety seconds — and Kade dead at his desk. The system swears no one was there. The system is lying.",
+    story:
+      "Adrian Kade designed the penthouse to distrust humanity. Doors opened only for approved blood, cameras watched even the reflections in the rain, and the house intelligence could predict a guest's heartbeat before they lied. At 3:03 a.m., all that certainty collapsed into ninety seconds of impossible silence. The holograms outside kept advertising immortality while Kade died beside a glass of untouched water and a message that deleted itself as the detective entered. His bodyguard remembers nothing. His son knows too many back doors. The architect of his implants keeps looking at the ceiling as if the building might accuse her first. In a room sealed against the world, the most dangerous witness may be the room itself.",
     setting: "A rain-slicked cyber-noir megacity; a sealed smart-penthouse wrapped in drifting holograms.",
     victim: "Adrian Kade — founder of Halcyon Systems.",
     era: "Near-Future",
@@ -311,6 +328,8 @@ export const CASES: MysteryCase[] = [
     teaser: "Champagne, buried secrets, and a body in the stateroom.",
     premise:
       "Anchored a mile offshore, the superyacht Mirabel glitters with the city's skyline and its dirtiest money. The host gathers his guests on deck for a toast he'll never finish — below, in the stateroom, Gerald Whitmore is found with a letter-opener where his cufflinks should be. The tender boats are still ashore. The party can't leave. Neither can the killer.",
+    story:
+      "The Mirabel was built for wealth to misbehave: three decks of champagne, polished teak, and rooms where signatures cost more than jewels. Gerald Whitmore loved an audience, especially one that owed him money, obedience, or silence. Tonight he promised a toast, a business announcement, and one private humiliation too many. Then the stateroom door opened on blood, broken cufflinks, and a letter-opener from his own desk set. The radio is dead. The tender ropes are wet for no honest reason. Someone has wiped six minutes from a livestream that otherwise captured every smile. The skyline is close enough to see and too far away to save anyone. At sea, every secret has nowhere to run.",
     setting: "A billionaire's superyacht at night, distant city lights, champagne spilled on teak.",
     victim: "Gerald Whitmore — the billionaire host.",
     era: "Modern",
@@ -343,6 +362,8 @@ export const CASES: MysteryCase[] = [
     teaser: "The carnival rolls into town — and the ringmaster takes his final bow, permanently.",
     premise:
       "Stripes and lanterns rise at the edge of town, and the barker promises wonders for a nickel. Under the big top, the ringmaster lifts his hat for the closing bow and does not lift his head again. The carousel still turns. The crowd thinks it's part of the act. The performers know it isn't — because one of them wrote this finale.",
+    story:
+      "At dusk the carnival blooms like a bruise on the edge of town, all striped canvas, sugar smoke, painted smiles, and music that sounds cheerful only from a distance. Augustus Vell owned every tent and most of the people in them, because his little black book knew which names were false, which acts were stolen, and which bodies should have stayed buried. During the closing bow, the lights flared white, the crowd applauded, and Vell folded under his own spotlight as if yanked by an invisible string. The carousel kept turning without riders. The fortune teller had already dealt Death. The strongman's bar was found too clean. By morning the carnival will move on, unless the truth pins it to the dirt.",
     setting: "A traveling 1930s carnival after dark — eerie striped tents, a still carousel, fog between the lights.",
     victim: "Augustus Vell — the ringmaster.",
     era: "1930s",

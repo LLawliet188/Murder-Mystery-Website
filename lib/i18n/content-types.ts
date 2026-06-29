@@ -6,7 +6,7 @@ import type { CaseScript, Round, CharacterBrief } from "@/lib/scripts";
 // English source. Any missing field falls back to English.
 
 export type CaseOverlay = Partial<
-  Pick<MysteryCase, "title" | "teaser" | "premise" | "setting" | "victim" | "duration" | "included">
+  Pick<MysteryCase, "title" | "teaser" | "premise" | "story" | "setting" | "victim" | "duration" | "included">
 > & { cast?: Partial<Suspect>[] };
 
 export type ScriptOverlay = Partial<

@@ -199,6 +199,7 @@ function buildHtml(
     </div>
     <div class="brief">
       <div class="brief-h">${esc(t("pdf.premise"))}</div><p>${esc(mystery.premise)}</p>
+      <div class="brief-h">${esc(t("pdf.story"))}</div><p>${esc(mystery.story)}</p>
       <div class="brief-h">${esc(t("pdf.setting"))}</div><p>${esc(mystery.setting)}</p>
       <div class="brief-h">${esc(t("pdf.victim"))}</div><p>${esc(mystery.victim)}</p>
     </div>

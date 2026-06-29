@@ -17,6 +17,7 @@ function mergeCase(base: MysteryCase, ov?: CaseOverlay): MysteryCase {
     title: ov.title ?? base.title,
     teaser: ov.teaser ?? base.teaser,
     premise: ov.premise ?? base.premise,
+    story: ov.story ?? base.story,
     setting: ov.setting ?? base.setting,
     victim: ov.victim ?? base.victim,
     duration: ov.duration ?? base.duration,

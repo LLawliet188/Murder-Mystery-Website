@@ -14,10 +14,10 @@ interface AudioCtx {
 
 const Ctx = createContext<AudioCtx | null>(null);
 
-const BED_GAIN = 0.05; // ambient drone/rain underlay
-const SCORE_GAIN = 0.2; // procedural noir score
-const MUSIC_GAIN = 0.3; // file-based track, if present
-const SFX_GAIN = 0.5;
+const BED_GAIN = 0.065; // ambient drone/rain underlay
+const SCORE_GAIN = 0.23; // procedural parlor-noir score
+const MUSIC_GAIN = 0.24; // file-based track, if present
+const SFX_GAIN = 0.45;
 
 const MUSIC_SRC = "/sounds/theme-loop.mp3";
 const SFX_SRC: Record<SfxName, string> = {
@@ -40,12 +40,12 @@ function hasAudioSupport() {
 // a soft arpeggio, and a sparse high melody. Mysterious, Holmesian, and — since
 // it's synthesized — entirely original and royalty-free.
 const PROG = [
-  { bass: 110.0, arp: [220.0, 261.63, 329.63] }, // Am
-  { bass: 87.31, arp: [174.61, 220.0, 261.63] }, // F
-  { bass: 130.81, arp: [261.63, 329.63, 392.0] }, // C
-  { bass: 82.41, arp: [164.81, 207.65, 246.94] }, // E (with G#)
+  { bass: 73.42, arp: [146.83, 174.61, 220.0, 277.18] }, // Dm(add9)
+  { bass: 58.27, arp: [116.54, 146.83, 174.61, 233.08] }, // Bbmaj7 shadow
+  { bass: 65.41, arp: [130.81, 155.56, 196.0, 246.94] }, // C minor color
+  { bass: 55.0, arp: [110.0, 138.59, 164.81, 207.65] }, // A7 tension
 ];
-const MELODY = [523.25, 493.88, 440.0, 392.0, 349.23, 440.0]; // C5 B4 A4 G4 F4 A4
+const MELODY = [587.33, 554.37, 523.25, 466.16, 440.0, 392.0]; // D5 C#5 C5 Bb4 A4 G4
 
 function tone(
   ctx: AudioContext,
@@ -83,12 +83,19 @@ function tone(
 function scheduleBar(ctx: AudioContext, bus: AudioNode, barIndex: number, t0: number, beat: number) {
   const bar = beat * 4;
   const chord = PROG[barIndex % PROG.length];
-  tone(ctx, bus, chord.bass, t0, bar * 0.98, 0.16, "sine"); // bass pulse
-  chord.arp.forEach((f, i) => tone(ctx, bus, f, t0 + i * beat, beat * 0.9, 0.085, "triangle")); // arpeggio
-  tone(ctx, bus, chord.arp[0] * 2, t0 + 3 * beat, beat * 0.9, 0.05, "triangle"); // octave shimmer
+  tone(ctx, bus, chord.bass, t0, bar * 1.05, 0.12, "sine"); // candlelit low drone
+  tone(ctx, bus, chord.bass / 2, t0 + beat * 2, beat * 1.85, 0.055, "sine"); // distant floorboard thrum
+
+  const steps = [0, 0.72, 1.48, 2.62];
+  chord.arp.forEach((f, i) => tone(ctx, bus, f, t0 + steps[i] * beat, beat * 0.72, 0.055, "triangle"));
+  tone(ctx, bus, chord.arp[1] * 2, t0 + 3.35 * beat, beat * 0.52, 0.035, "sine"); // glassy question mark
   if (barIndex % 2 === 1) {
     const m = MELODY[(barIndex >> 1) % MELODY.length];
-    tone(ctx, bus, m, t0 + beat * 1.5, beat * 1.5, 0.06, "sine"); // sparse melody
+    tone(ctx, bus, m, t0 + beat * 1.38, beat * 1.25, 0.052, "sine"); // sparse music-box melody
+  }
+  if (barIndex % 4 === 3) {
+    tone(ctx, bus, 466.16, t0 + beat * 3.04, beat * 0.58, 0.028, "sine");
+    tone(ctx, bus, 493.88, t0 + beat * 3.08, beat * 0.52, 0.022, "sine"); // close dissonance before the loop turns
   }
 }
 
@@ -133,16 +140,16 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     if (!AC) return null;
     const ctx = new AC();
 
-    // ambient bed: low drone + filtered "rain"
+    // ambient bed: low drone + filtered rain
     const bed = ctx.createGain();
     bed.gain.value = 0;
     bed.connect(ctx.destination);
-    [55, 55.4].forEach((f) => {
+    [36.71, 37.06, 55].forEach((f, i) => {
       const osc = ctx.createOscillator();
       osc.type = "sine";
       osc.frequency.value = f;
       const g = ctx.createGain();
-      g.gain.value = 0.32;
+      g.gain.value = i === 2 ? 0.16 : 0.22;
       osc.connect(g).connect(bed);
       osc.start();
     });
@@ -160,16 +167,16 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     noise.loop = true;
     const band = ctx.createBiquadFilter();
     band.type = "bandpass";
-    band.frequency.value = 620;
-    band.Q.value = 0.7;
+    band.frequency.value = 840;
+    band.Q.value = 0.55;
     const noiseGain = ctx.createGain();
-    noiseGain.gain.value = 0.5;
+    noiseGain.gain.value = 0.42;
     noise.connect(band).connect(noiseGain).connect(bed);
     noise.start();
     const lfo = ctx.createOscillator();
-    lfo.frequency.value = 0.07;
+    lfo.frequency.value = 0.045;
     const lfoGain = ctx.createGain();
-    lfoGain.gain.value = 0.28;
+    lfoGain.gain.value = 0.22;
     lfo.connect(lfoGain).connect(noiseGain.gain);
     lfo.start();
 
@@ -178,8 +185,17 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     scoreBus.gain.value = 0;
     const lp = ctx.createBiquadFilter();
     lp.type = "lowpass";
-    lp.frequency.value = 2400;
+    lp.frequency.value = 1900;
+    const delay = ctx.createDelay(1.2);
+    delay.delayTime.value = 0.38;
+    const feedback = ctx.createGain();
+    feedback.gain.value = 0.16;
+    const wet = ctx.createGain();
+    wet.gain.value = 0.22;
     scoreBus.connect(lp).connect(ctx.destination);
+    lp.connect(delay);
+    delay.connect(feedback).connect(delay);
+    delay.connect(wet).connect(ctx.destination);
 
     // sfx bus
     const sfxBus = ctx.createGain();
@@ -197,7 +213,7 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     const ctx = ctxRef.current;
     const bus = scoreBusRef.current;
     if (!ctx || !bus || scoreTimerRef.current != null) return;
-    const beat = 0.82;
+    const beat = 0.96;
     let bar = scoreStateRef.current.bar;
     let nextTime = Math.max(ctx.currentTime + 0.15, scoreStateRef.current.nextTime);
     const tick = () => {

@@ -120,6 +120,9 @@ export function Dossier({ mystery: base }: { mystery: MysteryCase }) {
             <TypeLabel>{t("dossier.premise")}</TypeLabel>
             <p className="mt-3 font-body text-lg leading-relaxed text-parchment">{mystery.premise}</p>
 
+            <TypeLabel className="mt-10">{t("dossier.story")}</TypeLabel>
+            <p className="mt-3 whitespace-pre-line font-serif text-xl italic leading-relaxed text-parchment-dim">{mystery.story}</p>
+
             <TypeLabel className="mt-10">{t("dossier.setting")}</TypeLabel>
             <p className="mt-3 font-body text-lg leading-relaxed text-parchment-dim">{mystery.setting}</p>
 
