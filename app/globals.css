@@ -29,10 +29,10 @@
   --color-smoke-dim: #5d5a52;
 
   /* Fonts (vars injected by next/font in layout.tsx) */
-  --font-display: var(--font-cinzel), "Cinzel", serif;
-  --font-serif: var(--font-cormorant), "Cormorant Garamond", serif;
-  --font-body: var(--font-eb-garamond), "EB Garamond", Georgia, serif;
-  --font-type: var(--font-special-elite), "Courier New", monospace;
+  --font-display: var(--font-cinzel), "Cinzel", "Noto Serif Devanagari", "Nirmala UI", Mangal, serif;
+  --font-serif: var(--font-cormorant), "Cormorant Garamond", "Noto Serif Devanagari", "Nirmala UI", Mangal, serif;
+  --font-body: var(--font-eb-garamond), "EB Garamond", Georgia, "Noto Serif Devanagari", "Nirmala UI", Mangal, serif;
+  --font-type: var(--font-special-elite), "Nirmala UI", Mangal, "Courier New", monospace;
 
   /* Motion tokens */
   --ease-noir: cubic-bezier(0.22, 1, 0.36, 1);

@@ -43,8 +43,11 @@ export function useRank() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    setOpened(read());
-    setReady(true);
+    const id = window.setTimeout(() => {
+      setOpened(read());
+      setReady(true);
+    }, 0);
+    return () => window.clearTimeout(id);
   }, []);
 
   const markOpened = useCallback((slug: string): { isNew: boolean; count: number } => {

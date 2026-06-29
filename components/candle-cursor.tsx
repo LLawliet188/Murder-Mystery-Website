@@ -19,7 +19,7 @@ export function CandleCursor() {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (!fine || reduce) return;
 
-    setActive(true);
+    const activate = window.setTimeout(() => setActive(true), 0);
     document.documentElement.classList.add("candle-active");
 
     const onMove = (e: MouseEvent) => {
@@ -48,6 +48,7 @@ export function CandleCursor() {
     raf.current = requestAnimationFrame(tick);
 
     return () => {
+      window.clearTimeout(activate);
       window.removeEventListener("mousemove", onMove);
       cancelAnimationFrame(raf.current);
       document.documentElement.classList.remove("candle-active");

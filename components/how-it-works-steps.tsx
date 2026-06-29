@@ -1,11 +1,7 @@
-import { Reveal } from "./reveal";
+"use client";
 
-export interface Step {
-  n: string;
-  title: string;
-  body: string;
-  icon: React.ReactNode;
-}
+import { Reveal } from "./reveal";
+import { useT } from "@/lib/i18n/ui";
 
 const stroke = {
   stroke: "currentColor",
@@ -15,11 +11,10 @@ const stroke = {
   fill: "none",
 };
 
-export const STEPS: Step[] = [
+const STEPS = [
   {
     n: "I",
-    title: "Gather Your Party",
-    body: "Three to six conspirators and one long, candlelit night. Tell us how many will sit at the table.",
+    key: "step1",
     icon: (
       <svg viewBox="0 0 32 32" {...stroke}>
         <circle cx="11" cy="12" r="4" />
@@ -30,8 +25,7 @@ export const STEPS: Step[] = [
   },
   {
     n: "II",
-    title: "Choose Your Case",
-    body: "We deal only the mysteries engineered for your exact number — then you pick the night's crime.",
+    key: "step2",
     icon: (
       <svg viewBox="0 0 32 32" {...stroke}>
         <rect x="6" y="5" width="14" height="20" rx="2" transform="rotate(-8 13 15)" />
@@ -41,8 +35,7 @@ export const STEPS: Step[] = [
   },
   {
     n: "III",
-    title: "Assign Your Suspects",
-    body: "Each guest receives a sealed dossier — a name, a secret, and a reason to lie all evening.",
+    key: "step3",
     icon: (
       <svg viewBox="0 0 32 32" {...stroke}>
         <path d="M6 10c0-3 4-4 10-4s10 1 10 4v14c0 3-4 4-10 4S6 27 6 24z" />
@@ -52,8 +45,7 @@ export const STEPS: Step[] = [
   },
   {
     n: "IV",
-    title: "Uncover the Truth",
-    body: "Interrogate. Accuse. Unmask. When the candles burn low, only one of you knows how it ends.",
+    key: "step4",
     icon: (
       <svg viewBox="0 0 32 32" {...stroke}>
         <circle cx="14" cy="14" r="8" />
@@ -64,6 +56,7 @@ export const STEPS: Step[] = [
 ];
 
 export function StepsGrid() {
+  const t = useT();
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
       {STEPS.map((s, i) => (
@@ -75,8 +68,8 @@ export function StepsGrid() {
             <div className="relative mb-4 grid h-12 w-12 place-items-center rounded-full border border-gold/40 text-amber-glow">
               <span className="h-6 w-6">{s.icon}</span>
             </div>
-            <h3 className="relative font-display text-lg tracking-wide text-parchment">{s.title}</h3>
-            <p className="relative mt-2 font-body text-[0.95rem] leading-relaxed text-parchment-dim">{s.body}</p>
+            <h3 className="relative font-display text-lg tracking-wide text-parchment">{t(s.key + ".t")}</h3>
+            <p className="relative mt-2 font-body text-[0.95rem] leading-relaxed text-parchment-dim">{t(s.key + ".d")}</p>
           </div>
         </Reveal>
       ))}

@@ -19,16 +19,19 @@ export function PartyProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const n = parseInt(raw, 10);
-        if (n >= 3 && n <= 6) setSizeState(n);
+    const id = window.setTimeout(() => {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const n = parseInt(raw, 10);
+          if (n >= 3 && n <= 6) setSizeState(n);
+        }
+      } catch {
+        /* ignore */
       }
-    } catch {
-      /* ignore */
-    }
-    setReady(true);
+      setReady(true);
+    }, 0);
+    return () => window.clearTimeout(id);
   }, []);
 
   const setSize = useCallback((n: number | null) => {

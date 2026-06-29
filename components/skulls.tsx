@@ -18,18 +18,27 @@ function Skull({ lit }: { lit: boolean }) {
   );
 }
 
-export function Skulls({ value, showLabel = false, className }: { value: number; showLabel?: boolean; className?: string }) {
+export function Skulls({
+  value,
+  showLabel = false,
+  label,
+  className,
+}: {
+  value: number;
+  showLabel?: boolean;
+  label?: string;
+  className?: string;
+}) {
+  const text = label ?? DIFFICULTY_LABEL[value];
   return (
-    <span className={cn("inline-flex items-center gap-1", className)} title={`${DIFFICULTY_LABEL[value]} — ${value}/5`}>
+    <span className={cn("inline-flex items-center gap-1", className)} title={`${text} — ${value}/5`}>
       <span className="flex gap-0.5">
         {[1, 2, 3, 4, 5].map((i) => (
           <Skull key={i} lit={i <= value} />
         ))}
       </span>
       {showLabel && (
-        <span className="ml-1.5 font-type text-[0.7rem] uppercase tracking-[0.18em] text-smoke">
-          {DIFFICULTY_LABEL[value]}
-        </span>
+        <span className="ml-1.5 font-type text-[0.7rem] uppercase tracking-[0.18em] text-smoke">{text}</span>
       )}
     </span>
   );

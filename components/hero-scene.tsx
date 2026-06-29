@@ -76,8 +76,11 @@ export function HeroScene() {
   const [webgl, setWebgl] = useState(true);
 
   useEffect(() => {
-    setMounted(true);
-    setWebgl(hasWebGL());
+    const id = window.setTimeout(() => {
+      setMounted(true);
+      setWebgl(hasWebGL());
+    }, 0);
+    return () => window.clearTimeout(id);
   }, []);
 
   if (!mounted || !webgl || reduce) return <KeyFallback />;

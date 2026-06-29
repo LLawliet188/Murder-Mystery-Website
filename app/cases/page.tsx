@@ -12,7 +12,7 @@ export default function CasesPage() {
     <Suspense
       fallback={
         <div className="grid min-h-[100svh] place-items-center">
-          <p className="anim-pulse-glow font-serif text-lg italic text-smoke">The case is still cooling…</p>
+          <p className="anim-pulse-glow font-serif text-lg italic text-smoke">VERDICT</p>
         </div>
       }
     >

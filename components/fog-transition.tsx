@@ -17,8 +17,11 @@ export function FogTransition({
   // completion callback: a backgrounded/throttled tab can pause the fade
   // indefinitely, which would otherwise strand the user under the fog.
   const onCoveredRef = useRef(onCovered);
-  onCoveredRef.current = onCovered;
   const firedRef = useRef(false);
+
+  useEffect(() => {
+    onCoveredRef.current = onCovered;
+  }, [onCovered]);
 
   useEffect(() => {
     if (!active) {

@@ -9,14 +9,19 @@ import { StepsGrid } from "./how-it-works-steps";
 import { Reveal } from "./reveal";
 import { Ornament } from "./ornament";
 import { useParty } from "@/lib/party-context";
-import { CASES } from "@/lib/cases";
+import { caseFor } from "@/lib/i18n/content";
+import { useLang } from "@/lib/i18n/lang";
+import { useT } from "@/lib/i18n/ui";
+import type { MysteryCase } from "@/lib/cases";
 
-const FEATURED = ["manor-of-whispers", "neon-requiem", "the-masquerade"]
-  .map((s) => CASES.find((c) => c.slug === s)!)
-  .filter(Boolean);
+const FEATURED_SLUGS = ["manor-of-whispers", "neon-requiem", "the-masquerade"];
 
 export function Landing() {
   const { size } = useParty();
+  const { lang } = useLang();
+  const t = useT();
+
+  const featured = FEATURED_SLUGS.map((s) => caseFor(s, lang)).filter((c): c is MysteryCase => !!c);
 
   return (
     <div className="relative">
@@ -25,7 +30,6 @@ export function Landing() {
         <div className="absolute inset-0 z-0">
           <HeroScene />
         </div>
-        {/* darken center for legibility, let the key glow at the edges */}
         <div
           className="absolute inset-0 z-[1]"
           style={{
@@ -42,7 +46,7 @@ export function Landing() {
             transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
             className="mb-5 font-type text-[0.7rem] uppercase tracking-[0.32em] text-amber/70 sm:text-sm"
           >
-            A Murder Mystery Experience
+            {t("hero.kicker")}
           </motion.p>
 
           <motion.h1
@@ -51,9 +55,9 @@ export function Landing() {
             transition={{ duration: 1, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
             className="font-display fluid-hero font-semibold leading-[0.95] text-parchment"
           >
-            Everyone&apos;s
+            {t("hero.title1")}
             <br />
-            <span className="text-glow-blood text-crimson-bright">a Suspect.</span>
+            <span className="text-glow-blood text-crimson-bright">{t("hero.title2")}</span>
           </motion.h1>
 
           <motion.p
@@ -62,7 +66,7 @@ export function Landing() {
             transition={{ duration: 1, delay: 0.4 }}
             className="mt-6 max-w-xl font-serif fluid-lead italic text-parchment-dim"
           >
-            Gather your party. Choose your case. Only one of you knows the truth.
+            {t("hero.sub")}
           </motion.p>
 
           <motion.div
@@ -84,7 +88,7 @@ export function Landing() {
               href="/cases"
               className="font-serif text-sm tracking-wide text-smoke underline-offset-8 transition-colors hover:text-amber hover:underline"
             >
-              … or simply browse the case files
+              {t("hero.browse")}
             </Link>
           </motion.div>
         </div>
@@ -106,12 +110,8 @@ export function Landing() {
       <section className="relative px-4 py-20 sm:py-28">
         <Reveal className="mx-auto max-w-3xl text-center">
           <Ornament />
-          <p className="mt-8 font-display fluid-h2 leading-tight text-parchment">
-            Ten ways to get away
-            <br />
-            with <span className="text-crimson-bright text-glow-blood">murder.</span>
-          </p>
-          <p className="mt-5 font-serif fluid-lead italic text-smoke">Choose carefully.</p>
+          <p className="mt-8 font-display fluid-h2 leading-tight text-parchment">{t("whisper.l1")}</p>
+          <p className="mt-5 font-serif fluid-lead italic text-smoke">{t("whisper.l2")}</p>
         </Reveal>
       </section>
 
@@ -120,19 +120,16 @@ export function Landing() {
         <div className="mx-auto max-w-7xl">
           <Reveal className="mb-10 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="font-type text-xs uppercase tracking-[0.24em] text-gold/70">The Collection</p>
-              <h2 className="mt-2 font-display fluid-h2 text-parchment">Featured Case Files</h2>
+              <p className="font-type text-xs uppercase tracking-[0.24em] text-gold/70">{t("landing.featuredKicker")}</p>
+              <h2 className="mt-2 font-display fluid-h2 text-parchment">{t("landing.featuredTitle")}</h2>
             </div>
-            <Link
-              href="/cases"
-              className="btn-seal rounded-full px-6 py-3 text-sm"
-            >
-              View All Cases
+            <Link href="/cases" className="btn-seal rounded-full px-6 py-3 text-sm">
+              {t("landing.allCases")}
             </Link>
           </Reveal>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {FEATURED.map((c, i) => (
+            {featured.map((c, i) => (
               <Reveal key={c.slug} delay={i * 0.1}>
                 <CaseCard mystery={c} partySize={size} />
               </Reveal>
@@ -145,8 +142,8 @@ export function Landing() {
       <section className="relative px-4 py-24 sm:px-8">
         <div className="mx-auto max-w-7xl">
           <Reveal className="mb-12 text-center">
-            <p className="font-type text-xs uppercase tracking-[0.24em] text-gold/70">The Method</p>
-            <h2 className="mt-2 font-display fluid-h2 text-parchment">How the Night Unfolds</h2>
+            <p className="font-type text-xs uppercase tracking-[0.24em] text-gold/70">{t("how.kicker")}</p>
+            <h2 className="mt-2 font-display fluid-h2 text-parchment">{t("how.title")}</h2>
           </Reveal>
           <StepsGrid />
         </div>
@@ -156,13 +153,10 @@ export function Landing() {
       <section className="relative px-4 py-28 sm:py-36">
         <Reveal className="mx-auto max-w-2xl text-center">
           <Ornament />
-          <h2 className="mt-8 font-display fluid-h2 text-parchment">Gather Your Party</h2>
-          <p className="mx-auto mt-4 max-w-lg font-serif fluid-lead italic text-parchment-dim">
-            The candles are lit. The dossiers are sealed. Somewhere in your circle of friends, a
-            murderer is already rehearsing an alibi.
-          </p>
+          <h2 className="mt-8 font-display fluid-h2 text-parchment">{t("landing.closingTitle")}</h2>
+          <p className="mx-auto mt-4 max-w-lg font-serif fluid-lead italic text-parchment-dim">{t("landing.closingBody")}</p>
           <div className="mt-12">
-            <PlayerCountSelector prompt="So — how many will sit at the table tonight?" />
+            <PlayerCountSelector />
           </div>
         </Reveal>
       </section>

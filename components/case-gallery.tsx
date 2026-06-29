@@ -5,16 +5,17 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useParty } from "@/lib/party-context";
 import {
-  CASES,
   ERAS,
   MOODS,
   PARTY_SIZES,
-  DIFFICULTY_LABEL,
   rankCasesForParty,
   supportsParty,
   fitForParty,
   type MysteryCase,
 } from "@/lib/cases";
+import { casesFor } from "@/lib/i18n/content";
+import { useLang } from "@/lib/i18n/lang";
+import { useT } from "@/lib/i18n/ui";
 import { CaseCard } from "./case-card";
 import { Skulls } from "./skulls";
 import { Ornament } from "./ornament";
@@ -25,6 +26,8 @@ export function CaseGallery() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const reduce = useReducedMotion();
+  const { lang } = useLang();
+  const t = useT();
 
   const [difficulty, setDifficulty] = useState<number | null>(null);
   const [era, setEra] = useState<string | null>(null);
@@ -47,7 +50,7 @@ export function CaseGallery() {
   };
 
   const { perfectCount, results } = useMemo(() => {
-    let pool: MysteryCase[] = CASES;
+    let pool: MysteryCase[] = casesFor(lang);
 
     if (query.trim()) {
       const q = query.trim().toLowerCase();
@@ -70,11 +73,11 @@ export function CaseGallery() {
       ordered = pool;
     }
     return { perfectCount: perfect, results: ordered };
-  }, [query, difficulty, era, mood, size, showAll]);
+  }, [query, difficulty, era, mood, size, showAll, lang]);
 
   const dealMeACase = () => {
     const pickFrom = size != null ? results.filter((c) => supportsParty(c, size)) : results;
-    const pool = pickFrom.length ? pickFrom : CASES;
+    const pool = pickFrom.length ? pickFrom : casesFor(lang);
     const choice = pool[Math.floor(Math.random() * pool.length)];
     router.push(`/cases/${choice.slug}`);
   };
@@ -87,29 +90,19 @@ export function CaseGallery() {
     setShowAll(false);
   };
 
-  const heading =
-    size != null
-      ? `Mysteries for a Party of ${size}`
-      : "The Complete Case Files";
+  const heading = size != null ? t("gallery.titleParty", { n: size }) : t("gallery.titleAll");
 
   return (
     <div className="relative min-h-[100svh] px-4 pb-28 pt-28 sm:px-8">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <header className="mb-8 text-center">
-          <p className="font-type text-xs uppercase tracking-[0.24em] text-gold/70">The Dossiers</p>
+          <p className="font-type text-xs uppercase tracking-[0.24em] text-gold/70">{t("gallery.kicker")}</p>
           <h1 className="mt-2 font-display fluid-h2 text-parchment">{heading}</h1>
           <p className="mt-3 font-serif fluid-lead italic text-smoke">
-            {size != null ? (
-              <>
-                {results.length} cases on the table
-                {perfectCount > 0 && (
-                  <> — <span className="text-amber-glow">{perfectCount} perfect for your party.</span></>
-                )}
-              </>
-            ) : (
-              "Ten ways to get away with murder. Choose carefully."
-            )}
+            {size != null
+              ? t("gallery.countParty", { total: results.length, perfect: perfectCount })
+              : `${t("whisper.l1")} ${t("whisper.l2")}`}
           </p>
         </header>
 
@@ -118,11 +111,11 @@ export function CaseGallery() {
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex flex-wrap items-center gap-3">
               <span className="font-type text-[0.65rem] uppercase tracking-[0.2em] text-smoke">
-                Party Size
+                {t("gallery.partySize")}
               </span>
               <div className="flex items-center gap-2">
                 <Chip active={size == null} onClick={() => setParty(null)}>
-                  Any
+                  {t("gallery.any")}
                 </Chip>
                 {PARTY_SIZES.map((n) => (
                   <Chip key={n} active={size === n} onClick={() => setParty(n)}>
@@ -143,8 +136,8 @@ export function CaseGallery() {
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Whisper a clue…"
-                aria-label="Search the case files"
+                placeholder={t("gallery.search")}
+                aria-label={t("gallery.search")}
                 className="w-full rounded-full border border-gold/20 bg-black/40 py-2.5 pl-10 pr-4 font-serif text-sm text-parchment placeholder:text-smoke-dim focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40"
               />
             </div>
@@ -153,36 +146,36 @@ export function CaseGallery() {
           {/* Secondary filters */}
           <div className="mt-4 flex flex-col gap-4 border-t border-gold/10 pt-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="space-y-3">
-              <FilterRow label="Difficulty">
+              <FilterRow label={t("gallery.difficulty")}>
                 <Chip active={difficulty == null} onClick={() => setDifficulty(null)}>
-                  All
+                  {t("gallery.all")}
                 </Chip>
                 {[2, 3, 4, 5].map((d) => (
                   <Chip key={d} active={difficulty === d} onClick={() => setDifficulty(difficulty === d ? null : d)}>
                     <Skulls value={d} />
-                    <span className="ml-1.5 hidden sm:inline">{DIFFICULTY_LABEL[d]}</span>
+                    <span className="ml-1.5 hidden sm:inline">{t("diff." + d)}</span>
                   </Chip>
                 ))}
               </FilterRow>
 
-              <FilterRow label="Era">
+              <FilterRow label={t("gallery.era")}>
                 <Chip active={era == null} onClick={() => setEra(null)}>
-                  All
+                  {t("gallery.all")}
                 </Chip>
                 {ERAS.map((e) => (
                   <Chip key={e} active={era === e} onClick={() => setEra(era === e ? null : e)}>
-                    {e}
+                    {t("era." + e)}
                   </Chip>
                 ))}
               </FilterRow>
 
-              <FilterRow label="Mood">
+              <FilterRow label={t("gallery.mood")}>
                 <Chip active={mood == null} onClick={() => setMood(null)}>
-                  All
+                  {t("gallery.all")}
                 </Chip>
                 {MOODS.map((m) => (
                   <Chip key={m} active={mood === m} onClick={() => setMood(mood === m ? null : m)}>
-                    {m}
+                    {t("mood." + m)}
                   </Chip>
                 ))}
               </FilterRow>
@@ -197,13 +190,10 @@ export function CaseGallery() {
                     onChange={(e) => setShowAll(e.target.checked)}
                     className="h-4 w-4 accent-[#c9a227]"
                   />
-                  Show off-roster cases
+                  {t("gallery.showOff")}
                 </label>
               )}
-              <button
-                onClick={dealMeACase}
-                className="btn-seal flex items-center gap-2 rounded-full px-5 py-2.5 text-xs"
-              >
+              <button onClick={dealMeACase} className="btn-seal flex items-center gap-2 rounded-full px-5 py-2.5 text-xs">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
                   <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" strokeWidth="1.6" />
                   <circle cx="8.5" cy="8.5" r="1.4" fill="currentColor" />
@@ -211,7 +201,7 @@ export function CaseGallery() {
                   <circle cx="15.5" cy="8.5" r="1.4" fill="currentColor" />
                   <circle cx="8.5" cy="15.5" r="1.4" fill="currentColor" />
                 </svg>
-                Deal Me a Case
+                {t("gallery.deal")}
               </button>
             </div>
           </div>
@@ -221,10 +211,10 @@ export function CaseGallery() {
         {!ready ? null : results.length === 0 ? (
           <div className="py-24 text-center">
             <Ornament />
-            <p className="mt-8 font-serif fluid-lead italic text-smoke">The case is still cooling…</p>
-            <p className="mt-2 font-body text-parchment-dim">No mystery matches that combination.</p>
+            <p className="mt-8 font-serif fluid-lead italic text-smoke">{t("gallery.empty")}</p>
+            <p className="mt-2 font-body text-parchment-dim">{t("gallery.emptyHint")}</p>
             <button onClick={resetFilters} className="btn-seal mt-8 rounded-full px-6 py-3 text-sm">
-              Clear the Board
+              {t("gallery.clear")}
             </button>
           </div>
         ) : (
@@ -282,9 +272,7 @@ function Chip({
 function FilterRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <span className="mr-1 w-16 shrink-0 font-type text-[0.65rem] uppercase tracking-[0.2em] text-smoke">
-        {label}
-      </span>
+      <span className="mr-1 w-16 shrink-0 font-type text-[0.65rem] uppercase tracking-[0.2em] text-smoke">{label}</span>
       {children}
     </div>
   );

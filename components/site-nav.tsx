@@ -5,15 +5,18 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { AudioToggle } from "./audio-toggle";
+import { LanguageSwitcher } from "./language-switcher";
+import { useT } from "@/lib/i18n/ui";
 
 const LINKS = [
-  { href: "/cases", label: "Case Files" },
-  { href: "/how-it-works", label: "How It Works" },
-  { href: "/guild", label: "The Guild" },
+  { href: "/cases", key: "nav.cases" },
+  { href: "/how-it-works", key: "nav.how" },
+  { href: "/guild", key: "nav.guild" },
 ];
 
 export function SiteNav() {
   const pathname = usePathname();
+  const t = useT();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -51,7 +54,7 @@ export function SiteNav() {
                       active ? "text-amber-glow" : "text-smoke hover:text-parchment"
                     )}
                   >
-                    {l.label}
+                    {t(l.key)}
                     {active && (
                       <span className="absolute inset-x-2.5 bottom-1 h-px bg-gradient-to-r from-transparent via-gold to-transparent sm:inset-x-4" />
                     )}
@@ -62,6 +65,7 @@ export function SiteNav() {
           </ul>
           <span className="mx-1 hidden h-5 w-px bg-gold/20 sm:block" />
           <AudioToggle />
+          <LanguageSwitcher />
         </div>
       </nav>
     </header>

@@ -4,10 +4,14 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useRank, RANKS } from "@/lib/rank";
 import { CASES } from "@/lib/cases";
+import { useT } from "@/lib/i18n/ui";
 
 export function GuildRank() {
+  const t = useT();
   const { count, current, next, ready, opened } = useRank();
   const total = CASES.length;
+  const currentTitle = t(`rank.${current.title}`);
+  const nextTitle = next ? t(`rank.${next.title}`) : "";
 
   const progress = next
     ? Math.min(1, (count - current.at) / (next.at - current.at))
@@ -16,18 +20,18 @@ export function GuildRank() {
   return (
     <div className="glass relative overflow-hidden rounded-3xl p-8 sm:p-10">
       <div className="flex flex-col items-center text-center">
-        <span className="font-type text-xs uppercase tracking-[0.24em] text-gold/70">Your Standing</span>
+        <span className="font-type text-xs uppercase tracking-[0.24em] text-gold/70">{t("rank.standing")}</span>
         <motion.h2
           key={current.title}
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="mt-2 font-display text-[clamp(2rem,6vw,3.5rem)] text-amber-glow text-glow-gold"
         >
-          {ready ? current.title : "…"}
+          {ready ? currentTitle : "…"}
         </motion.h2>
         <p className="mt-2 font-serif fluid-lead italic text-parchment-dim">
-          {count} of {total} cases opened
-          {next && <> — {next.at - count} more to make {next.title}</>}
+          {t("rank.opened", { count, total })}
+          {next && <>{t("rank.toNext", { n: next.at - count, title: nextTitle })}</>}
         </p>
 
         {/* progress bar */}
@@ -67,9 +71,9 @@ export function GuildRank() {
                   />
                 </svg>
               </span>
-              <span className="mt-2 font-display text-xs tracking-wide text-parchment">{r.title}</span>
+              <span className="mt-2 font-display text-xs tracking-wide text-parchment">{t(`rank.${r.title}`)}</span>
               <span className="font-type text-[0.6rem] uppercase tracking-[0.14em] text-smoke">
-                {r.at === 0 ? "Start" : `${r.at} cases`}
+                {r.at === 0 ? t("rank.start") : t("rank.casesN", { n: r.at })}
               </span>
             </div>
           );
@@ -79,7 +83,7 @@ export function GuildRank() {
       {opened.length === 0 && ready && (
         <div className="mt-8 text-center">
           <Link href="/cases" className="btn-seal inline-block rounded-full px-7 py-3 text-sm">
-            Open Your First Case
+            {t("rank.firstCase")}
           </Link>
         </div>
       )}

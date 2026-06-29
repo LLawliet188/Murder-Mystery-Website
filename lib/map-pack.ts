@@ -1,20 +1,24 @@
 import { type MysteryCase } from "./cases";
-import { getFloorPlan } from "./floorplans";
+import { caseFor, floorFor } from "./i18n/content";
+import type { Lang } from "./i18n/lang";
+import { translate } from "./i18n/ui";
 
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 /** Opens a print-ready (Save as PDF) map of the case's scene with pathways. */
-export function openMapPack(mystery: MysteryCase, size: number) {
-  const html = buildMap(mystery, size);
+export function openMapPack(mystery: MysteryCase, size: number, lang: Lang = "en") {
+  const c = caseFor(mystery.slug, lang) ?? mystery;
+  const html = buildMap(c, size, lang);
   const blob = new Blob([html], { type: "text/html" });
   const url = URL.createObjectURL(blob);
   window.open(url, "_blank", "noopener,noreferrer");
   setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
 
-function buildMap(mystery: MysteryCase, size: number) {
-  const plan = getFloorPlan(mystery.slug);
+function buildMap(mystery: MysteryCase, size: number, lang: Lang) {
+  const t = (key: string, vars?: Record<string, string | number>) => translate(lang, key, vars);
+  const plan = floorFor(mystery.slug, lang);
   const rooms = plan?.rooms ?? [];
   const total = rooms.length;
   const searches = Math.max(1, Math.min(size, total));
@@ -22,7 +26,7 @@ function buildMap(mystery: MysteryCase, size: number) {
   // central corridor band
   const corridor = `
     <rect x="6" y="34" width="88" height="4" rx="1" fill="rgba(120,90,40,0.12)" stroke="rgba(90,74,42,0.5)" stroke-width="0.3" />
-    <text x="50" y="36.9" text-anchor="middle" font-size="2.2" fill="rgba(90,74,42,0.8)" letter-spacing="0.3" style="font-family:'Special Elite',monospace">— THE HALL —</text>`;
+    <text x="50" y="36.9" text-anchor="middle" font-size="2.2" fill="rgba(90,74,42,0.8)" letter-spacing="0.3" style="font-family:'Special Elite','Nirmala UI',Mangal,monospace">— ${esc(t("pdf.hall"))} —</text>`;
 
   const roomSvg = rooms
     .map((r, i) => {
@@ -38,8 +42,8 @@ function buildMap(mystery: MysteryCase, size: number) {
           fill="rgba(120,90,40,0.06)" stroke="#5a4a2a" stroke-width="0.45" />
         <line x1="${cx}" y1="${y1}" x2="${cx}" y2="${y2}" stroke="#5a4a2a" stroke-width="0.5" stroke-dasharray="0.8 0.8" />
         <circle cx="${cx}" cy="${y1}" r="0.7" fill="#7a1010" />
-        <text x="${cx}" y="${cy - 1}" text-anchor="middle" font-size="6" fill="#3a2a12" style="font-family:'Cinzel',serif">${i + 1}</text>
-        <text x="${cx}" y="${cy + 4}" text-anchor="middle" font-size="2.6" fill="#5a4a2a" style="font-family:'EB Garamond',serif">${esc(r.label)}</text>
+        <text x="${cx}" y="${cy - 1}" text-anchor="middle" font-size="6" fill="#3a2a12" style="font-family:'Cinzel','Nirmala UI',Mangal,serif">${i + 1}</text>
+        <text x="${cx}" y="${cy + 4}" text-anchor="middle" font-size="2.6" fill="#5a4a2a" style="font-family:'EB Garamond','Nirmala UI',Mangal,serif">${esc(r.label)}</text>
         ${i === 0 ? `<text x="${r.x + r.w - 4}" y="${r.y + 5}" text-anchor="middle" font-size="5" fill="#7a1010">✕</text>` : ""}
       </g>`;
     })
@@ -50,17 +54,17 @@ function buildMap(mystery: MysteryCase, size: number) {
     .join("");
 
   return `<!doctype html>
-<html lang="en"><head>
+<html lang="${lang}"><head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>${esc(mystery.title)} — Scene Map</title>
+<title>${esc(t("pdf.titleMap", { title: mystery.title }))}</title>
 <style>
   @page { margin: 16mm; }
   * { box-sizing: border-box; }
-  body { margin: 0; color: #2a2012; font-family: "EB Garamond", Georgia, serif;
+  body { margin: 0; color: #2a2012; font-family: "EB Garamond", Georgia, "Noto Serif Devanagari", "Nirmala UI", Mangal, serif;
     background: repeating-linear-gradient(0deg, rgba(120,90,40,0.04) 0 2px, transparent 2px 5px), linear-gradient(135deg, #efe2c0, #ddccA0); }
   .page { padding: 40px; }
-  h1, .kicker, .num { font-family: "Cinzel", Georgia, serif; }
+  h1, .kicker, .num { font-family: "Cinzel", Georgia, "Noto Serif Devanagari", "Nirmala UI", Mangal, serif; }
   .kicker { letter-spacing: 0.35em; text-transform: uppercase; font-size: 12px; color: #7a1010; text-align: center; }
   h1 { font-size: 34px; margin: 8px 0 2px; text-align: center; letter-spacing: 0.04em; }
   .sub { text-align: center; font-style: italic; color: #5a4a2a; margin: 0 0 22px; }
@@ -79,7 +83,7 @@ function buildMap(mystery: MysteryCase, size: number) {
 </style>
 </head>
 <body><div class="page">
-  <div class="kicker">A VERDICT Mystery · The Scene</div>
+  <div class="kicker">${esc(t("pdf.sceneKicker"))}</div>
   <h1>${esc(plan?.title ?? mystery.title)}</h1>
   <p class="sub">${esc(mystery.setting)}</p>
 
@@ -93,18 +97,15 @@ function buildMap(mystery: MysteryCase, size: number) {
 
   <div class="cols">
     <div class="col">
-      <h3>The Rooms</h3>
+      <h3>${esc(t("pdf.rooms"))}</h3>
       <ol class="legend">${legend}</ol>
     </div>
     <div class="col">
-      <h3>How to Investigate</h3>
+      <h3>${esc(t("pdf.mapHow"))}</h3>
       <p class="rules">
-        Every room opens off <strong>the central hall</strong>. During the night your party may search
-        <strong>only ${searches} of the ${total} rooms</strong> — one search per guest. Decide together where
-        to look. Some rooms hold evidence; others are <strong>dead ends and decoys</strong>. Choose carefully —
-        you cannot search them all.
+        ${esc(t("pdf.mapRules", { searches, total }))}
       </p>
-      <div class="seal-note">The killer's name stays sealed until the Verdict — even from the host.</div>
+      <div class="seal-note">${esc(t("pdf.sealNote"))}</div>
     </div>
   </div>
 </div></body></html>`;

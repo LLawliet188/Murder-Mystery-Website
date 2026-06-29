@@ -33,29 +33,32 @@ export function Atmosphere() {
 
   useEffect(() => {
     if (reduce) return;
-    const hues = ["#e9b96b", "#c41e3a", "#ffcf8a", "#c9a227"];
-    setEmbers(
-      Array.from({ length: 18 }, () => ({
-        left: Math.random() * 100,
-        delay: Math.random() * 14,
-        duration: 12 + Math.random() * 14,
-        size: 1 + Math.random() * 2.5,
-        drift: (Math.random() - 0.5) * 120,
-        hue: hues[Math.floor(Math.random() * hues.length)],
-      }))
-    );
-    setMotes(
-      Array.from({ length: 16 }, () => ({
-        left: Math.random() * 100,
-        top: Math.random() * 100,
-        delay: Math.random() * 12,
-        duration: 16 + Math.random() * 16,
-        size: 0.6 + Math.random() * 1.6,
-        dx: (Math.random() - 0.5) * 60,
-        dy: -20 - Math.random() * 50,
-        opacity: 0.18 + Math.random() * 0.3,
-      }))
-    );
+    const id = window.setTimeout(() => {
+      const hues = ["#e9b96b", "#c41e3a", "#ffcf8a", "#c9a227"];
+      setEmbers(
+        Array.from({ length: 18 }, () => ({
+          left: Math.random() * 100,
+          delay: Math.random() * 14,
+          duration: 12 + Math.random() * 14,
+          size: 1 + Math.random() * 2.5,
+          drift: (Math.random() - 0.5) * 120,
+          hue: hues[Math.floor(Math.random() * hues.length)],
+        }))
+      );
+      setMotes(
+        Array.from({ length: 16 }, () => ({
+          left: Math.random() * 100,
+          top: Math.random() * 100,
+          delay: Math.random() * 12,
+          duration: 16 + Math.random() * 16,
+          size: 0.6 + Math.random() * 1.6,
+          dx: (Math.random() - 0.5) * 60,
+          dy: -20 - Math.random() * 50,
+          opacity: 0.18 + Math.random() * 0.3,
+        }))
+      );
+    }, 0);
+    return () => window.clearTimeout(id);
   }, [reduce]);
 
   return (

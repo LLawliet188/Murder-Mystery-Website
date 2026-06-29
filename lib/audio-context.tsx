@@ -28,6 +28,13 @@ const SFX_SRC: Record<SfxName, string> = {
   page: "/sounds/page-turn.mp3",
 };
 
+function hasAudioSupport() {
+  return (
+    typeof window !== "undefined" &&
+    !!(window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext)
+  );
+}
+
 // ── Procedural noir score ────────────────────────────────────────────────
 // A slow minor-key progression (A minor: i – VI – III – V) with a bass pulse,
 // a soft arpeggio, and a sparse high melody. Mysterious, Holmesian, and — since
@@ -111,10 +118,8 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
   const sfxHowlsRef = useRef<Partial<Record<SfxName, Howl>>>({});
 
   useEffect(() => {
-    setSupported(
-      typeof window !== "undefined" &&
-        !!(window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext)
-    );
+    const id = window.setTimeout(() => setSupported(hasAudioSupport()), 0);
+    return () => window.clearTimeout(id);
   }, []);
 
   useEffect(() => {
@@ -434,18 +439,22 @@ export function AudioProvider({ children }: { children: React.ReactNode }) {
     [playSynth]
   );
 
+  const unloadSfx = useCallback(() => {
+    Object.values(sfxHowlsRef.current).forEach((h) => h?.unload());
+  }, []);
+
   useEffect(() => {
     return () => {
       stopScore();
       try {
         musicRef.current?.unload();
-        Object.values(sfxHowlsRef.current).forEach((h) => h?.unload());
+        unloadSfx();
       } catch {
         /* noop */
       }
       void ctxRef.current?.close();
     };
-  }, [stopScore]);
+  }, [stopScore, unloadSfx]);
 
   return <Ctx.Provider value={{ enabled, toggle, supported, playSfx }}>{children}</Ctx.Provider>;
 }

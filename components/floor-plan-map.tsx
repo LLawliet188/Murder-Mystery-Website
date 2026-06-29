@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { getFloorPlan } from "@/lib/floorplans";
+import { floorFor } from "@/lib/i18n/content";
+import { useLang } from "@/lib/i18n/lang";
 import { useAudio } from "@/lib/audio-context";
+import { useT } from "@/lib/i18n/ui";
 import { cn } from "@/lib/utils";
 
 type RoomState = "opened" | "available" | "locked";
@@ -23,9 +25,11 @@ export function FloorPlanMap({
   accent?: string;
   budget?: number;
 }) {
-  const plan = getFloorPlan(slug);
+  const { lang } = useLang();
+  const plan = floorFor(slug, lang);
   const reduce = useReducedMotion();
   const { playSfx } = useAudio();
+  const t = useT();
   const [opened, setOpened] = useState<string[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -62,13 +66,15 @@ export function FloorPlanMap({
       {/* investigation budget */}
       <div className="mb-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center">
         <span className="font-type text-xs uppercase tracking-[0.2em] text-gold/80">
-          {constrained ? `Investigate ${limit} of ${total} rooms` : "Investigate the scene"}
+          {constrained ? t("fp.investigateN", { limit, total }) : t("fp.investigate")}
         </span>
         {constrained && (
           <span className="font-serif text-sm italic text-smoke">
             {remaining > 0
-              ? `${remaining} ${remaining === 1 ? "search" : "searches"} remaining — choose wisely.`
-              : "Your searches are spent — the other rooms keep their secrets."}
+              ? remaining === 1
+                ? t("fp.remaining1")
+                : t("fp.remaining", { n: remaining })
+              : t("fp.spent")}
           </span>
         )}
       </div>
@@ -141,7 +147,11 @@ export function FloorPlanMap({
               onClick={() => investigate(r.id)}
               style={{ left: `${cx}%`, top: `${cy}%` }}
               aria-label={
-                st === "opened" ? `Re-examine ${r.label}` : st === "locked" ? `${r.label} — no searches left` : `Search ${r.label}`
+                st === "opened"
+                  ? t("fp.reexamine", { room: r.label })
+                  : st === "locked"
+                  ? t("fp.locked", { room: r.label })
+                  : t("fp.search", { room: r.label })
               }
               aria-pressed={isActive}
               className="group absolute -translate-x-1/2 -translate-y-1/2 outline-none"
@@ -196,9 +206,7 @@ export function FloorPlanMap({
           </motion.div>
         ) : (
           <p className="text-center font-serif italic text-smoke">
-            {remaining > 0
-              ? "Hold a light to a room — tap a glowing mark to search it. Not every room rewards you."
-              : "The scene has given up all it will tonight."}
+            {remaining > 0 ? t("fp.hint") : t("fp.done")}
           </p>
         )}
       </div>
@@ -206,7 +214,7 @@ export function FloorPlanMap({
       {/* evidence log — the rooms already searched */}
       {opened.length > 0 && (
         <div className="mt-6">
-          <p className="mb-3 font-type text-[0.65rem] uppercase tracking-[0.2em] text-gold/70">Evidence Log</p>
+          <p className="mb-3 font-type text-[0.65rem] uppercase tracking-[0.2em] text-gold/70">{t("fp.evidence")}</p>
           <ul className="space-y-2">
             {opened.map((id) => {
               const r = plan.rooms.find((x) => x.id === id);

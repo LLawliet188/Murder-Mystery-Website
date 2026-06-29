@@ -6,10 +6,11 @@ import { motion } from "framer-motion";
 import { useParty } from "@/lib/party-context";
 import { PARTY_SIZES } from "@/lib/cases";
 import { FogTransition } from "./fog-transition";
+import { useT } from "@/lib/i18n/ui";
 import { cn } from "@/lib/utils";
 
 export function PlayerCountSelector({
-  prompt = "How many will sit at the table tonight?",
+  prompt,
   className,
 }: {
   prompt?: string;
@@ -17,6 +18,7 @@ export function PlayerCountSelector({
 }) {
   const { size, setSize } = useParty();
   const router = useRouter();
+  const t = useT();
   const [pending, setPending] = useState<number | null>(null);
 
   const select = (n: number) => {
@@ -26,7 +28,7 @@ export function PlayerCountSelector({
 
   return (
     <div className={cn("flex flex-col items-center", className)}>
-      <p className="mb-6 text-center font-serif italic fluid-lead text-parchment-dim">{prompt}</p>
+      <p className="mb-6 text-center font-serif italic fluid-lead text-parchment-dim">{prompt ?? t("party.prompt")}</p>
 
       <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-7">
         {PARTY_SIZES.map((n, i) => {
@@ -41,7 +43,7 @@ export function PlayerCountSelector({
               transition={{ delay: 0.15 + i * 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
               whileHover={{ y: -8, scale: 1.06 }}
               whileTap={{ scale: 0.96 }}
-              aria-label={`A party of ${n}`}
+              aria-label={t("party.of", { n })}
               className="group relative grid place-items-center"
             >
               {/* halo */}
@@ -84,7 +86,7 @@ export function PlayerCountSelector({
 
       <FogTransition
         active={pending != null}
-        label="The case is still cooling…"
+        label={t("gallery.empty")}
         onCovered={() => router.push(`/cases?players=${pending}`)}
       />
     </div>

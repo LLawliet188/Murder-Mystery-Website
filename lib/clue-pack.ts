@@ -1,14 +1,18 @@
-import { rosterFor, DIFFICULTY_LABEL, type MysteryCase } from "./cases";
-import { getScript, briefFor } from "./scripts";
+import { rosterFor, type MysteryCase } from "./cases";
+import { caseFor, scriptFor } from "./i18n/content";
+import type { Lang } from "./i18n/lang";
+import { translate } from "./i18n/ui";
 
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 /** Builds a self-contained, print-ready clue pack (host script + filled
  *  character sheets) and opens it in a new tab. */
-export function openCluePack(mystery: MysteryCase, size: number) {
-  const roster = rosterFor(mystery, size);
-  const html = buildHtml(mystery, size, roster);
+export function openCluePack(mystery: MysteryCase, size: number, lang: Lang = "en") {
+  const c = caseFor(mystery.slug, lang) ?? mystery;
+  const roster = rosterFor(c, size);
+  const script = scriptFor(mystery.slug, lang);
+  const html = buildHtml(c, size, roster, script, lang);
   const blob = new Blob([html], { type: "text/html" });
   const url = URL.createObjectURL(blob);
   window.open(url, "_blank", "noopener,noreferrer");
@@ -18,22 +22,24 @@ export function openCluePack(mystery: MysteryCase, size: number) {
 function buildHtml(
   mystery: MysteryCase,
   size: number,
-  roster: { name: string; title: string; line: string }[]
+  roster: { name: string; title: string; line: string }[],
+  script: ReturnType<typeof scriptFor>,
+  lang: Lang
 ) {
-  const script = getScript(mystery.slug);
+  const t = (key: string, vars?: Record<string, string | number>) => translate(lang, key, vars);
 
   // ── How to play (everyone is a player; the killer stays sealed) ──
   const howTo = script
     ? `
     <section class="run">
-      <h2>How to Play</h2>
-      <p class="run-intro">Everyone is a player — including the host. <strong>No one knows who the killer is</strong> until the very end, when the sealed Verdict (the last page) is opened together.</p>
+      <h2>${esc(t("pdf.howTitle"))}</h2>
+      <p class="run-intro">${esc(t("pdf.howIntro"))}</p>
       <ol>
-        <li><strong>Set up.</strong> Print this pack and the Scene Map. Hand each guest only their own character sheet — never let anyone read another's secret. Keep the final sealed page folded and face-down.</li>
-        <li><strong>Open the night.</strong> Anyone may read the Opening narration aloud, then play through the rounds below.</li>
-        <li><strong>Investigate the rooms.</strong> Using the Scene Map (or the website), your party may search only <strong>as many rooms as there are players</strong>. Decide together where to look — some rooms hold evidence, others are decoys and dead ends.</li>
-        <li><strong>Accuse.</strong> After the final round, every player names who they believe did it, and why. Then vote.</li>
-        <li><strong>The Verdict.</strong> Only now does anyone break the seal on the last page — the killer is revealed to the whole table at once.</li>
+        <li><strong>${esc(t("pdf.stepSetupTitle"))}.</strong> ${esc(t("pdf.stepSetupBody"))}</li>
+        <li><strong>${esc(t("pdf.stepOpenTitle"))}.</strong> ${esc(t("pdf.stepOpenBody"))}</li>
+        <li><strong>${esc(t("pdf.stepInvestigateTitle"))}.</strong> ${esc(t("pdf.stepInvestigateBody"))}</li>
+        <li><strong>${esc(t("pdf.stepAccuseTitle"))}.</strong> ${esc(t("pdf.stepAccuseBody"))}</li>
+        <li><strong>${esc(t("pdf.stepVerdictTitle"))}.</strong> ${esc(t("pdf.stepVerdictBody"))}</li>
       </ol>
     </section>`
     : "";
@@ -42,26 +48,26 @@ function buildHtml(
   const sealedVerdict = script
     ? `
     <section class="host sealed">
-      <div class="warn">✱ Sealed · Open Only at the Verdict ✱</div>
-      <h2>The Verdict</h2>
+      <div class="warn">${esc(t("pdf.sealedWarn"))}</div>
+      <h2>${esc(t("pdf.verdictTitle"))}</h2>
       <p class="say">${esc(script.reveal)}</p>
-      <h3 class="reveal-h">Why &amp; How</h3>
+      <h3 class="reveal-h">${esc(t("pdf.whyHow"))}</h3>
       <p>${esc(script.hostNote)}</p>
-      <p class="seal-foot">Do not read this page until every player has made their accusation. The host is a player too — keep it folded and face-down until the end.</p>
+      <p class="seal-foot">${esc(t("pdf.sealFoot"))}</p>
     </section>`
     : "";
 
   // ── Narrator script: intro · rounds · reveal ──
-  const rounds = script
+      const rounds = script
     ? script.rounds
         .map(
-          (r) => `
+        (r) => `
       <div class="round">
         <h3>${esc(r.name)}</h3>
-        <p class="say"><span class="cue">Read aloud:</span> ${esc(r.narration)}</p>
-        <p class="do"><span class="cue">Host directs:</span> ${esc(r.instructions)}</p>
+        <p class="say"><span class="cue">${esc(t("pdf.readAloud"))}</span> ${esc(r.narration)}</p>
+        <p class="do"><span class="cue">${esc(t("pdf.hostDirects"))}</span> ${esc(r.instructions)}</p>
         <div class="clues">
-          <span class="cue">Reveal these clues:</span>
+          <span class="cue">${esc(t("pdf.revealClues"))}</span>
           <ul>${r.clues.map((c) => `<li>${esc(c)}</li>`).join("")}</ul>
         </div>
       </div>`
@@ -72,11 +78,11 @@ function buildHtml(
   const narrator = script
     ? `
     <section class="script">
-      <div class="kicker">The Narrator's Script</div>
-      <h2>Opening — Read Aloud</h2>
+      <div class="kicker">${esc(t("pdf.narratorKicker"))}</div>
+      <h2>${esc(t("pdf.openingRead"))}</h2>
       <p class="say">${esc(script.intro)}</p>
       ${rounds}
-      <p class="closing">After the final round, the table votes — then, and only then, break the seal on the last page for the Verdict.</p>
+      <p class="closing">${esc(t("pdf.closing"))}</p>
     </section>`
     : "";
 
@@ -89,34 +95,34 @@ function buildHtml(
 
   const sheets = roster
     .map((s, i) => {
-      const b = briefFor(mystery.slug, s.name);
+      const b = script?.briefs[i];
       return `
     <section class="sheet${b?.guilty ? " guilty" : ""}">
-      <div class="stamp">Confidential · For ${esc(s.name)}'s Eyes Only · Suspect ${i + 1} of ${roster.length}</div>
+      <div class="stamp">${esc(t("pdf.confidentialFor", { name: s.name, i: i + 1, total: roster.length }))}</div>
       <h2>${esc(s.name)}</h2>
       <p class="role">${esc(s.title)}</p>
       <p class="flavor">"${esc(s.line)}"</p>
-      ${field("Your relationship to the victim", b?.relationship)}
-      ${field("The secret you must keep", b?.secret)}
-      ${field("Where you were when it happened", b?.alibi)}
-      ${field("What you will say if accused", b?.accused)}
-      ${b?.guilty ? `<div class="mark">You are the murderer. Give nothing away.</div>` : ""}
+      ${field(t("pdf.relationship"), b?.relationship)}
+      ${field(t("pdf.secret"), b?.secret)}
+      ${field(t("pdf.alibi"), b?.alibi)}
+      ${field(t("pdf.accused"), b?.accused)}
+      ${b?.guilty ? `<div class="mark">${esc(t("pdf.guiltyMark"))}</div>` : ""}
       <div class="foot">VERDICT · ${esc(mystery.title)}</div>
     </section>`;
     })
     .join("");
 
   return `<!doctype html>
-<html lang="en"><head>
+<html lang="${lang}"><head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>${esc(mystery.title)} — Clue Pack</title>
+<title>${esc(t("pdf.titleClue", { title: mystery.title }))}</title>
 <style>
   @page { margin: 16mm; }
   * { box-sizing: border-box; }
   body {
     margin: 0; color: #2a2012;
-    font-family: "EB Garamond", Georgia, "Times New Roman", serif;
+    font-family: "EB Garamond", Georgia, "Times New Roman", "Noto Serif Devanagari", "Nirmala UI", Mangal, serif;
     background: #d8cba8;
   }
   .page {
@@ -125,7 +131,7 @@ function buildHtml(
       linear-gradient(135deg, #efe2c0, #ddccA0);
     padding: 40px;
   }
-  h1, h2, h3, .stamp, .role, .kicker, .warn { font-family: "Cinzel", Georgia, serif; }
+  h1, h2, h3, .stamp, .role, .kicker, .warn { font-family: "Cinzel", Georgia, "Noto Serif Devanagari", "Nirmala UI", Mangal, serif; }
   .cover { text-align: center; padding: 50px 20px; page-break-after: always; }
   .kicker { letter-spacing: 0.35em; text-transform: uppercase; font-size: 12px; color: #7a1010; }
   h1 { font-size: 40px; margin: 14px 0 6px; letter-spacing: 0.04em; }
@@ -182,19 +188,19 @@ function buildHtml(
 </head>
 <body><div class="page">
   <div class="cover">
-    <div class="kicker">A VERDICT Mystery</div>
+    <div class="kicker">${esc(t("pdf.mysteryKicker"))}</div>
     <h1>${esc(mystery.title)}</h1>
     <p class="teaser">${esc(mystery.teaser)}</p>
     <div class="meta">
-      <span>${size} Players</span>
-      <span>${esc(mystery.era)}</span>
-      <span>${esc(DIFFICULTY_LABEL[mystery.difficulty])} (${mystery.difficulty}/5)</span>
+      <span>${esc(t("pdf.players", { n: size }))}</span>
+      <span>${esc(t("era." + mystery.era))}</span>
+      <span>${esc(t("diff." + mystery.difficulty))} (${mystery.difficulty}/5)</span>
       <span>${esc(mystery.duration)}</span>
     </div>
     <div class="brief">
-      <div class="brief-h">The Premise</div><p>${esc(mystery.premise)}</p>
-      <div class="brief-h">The Setting</div><p>${esc(mystery.setting)}</p>
-      <div class="brief-h">The Victim</div><p>${esc(mystery.victim)}</p>
+      <div class="brief-h">${esc(t("pdf.premise"))}</div><p>${esc(mystery.premise)}</p>
+      <div class="brief-h">${esc(t("pdf.setting"))}</div><p>${esc(mystery.setting)}</p>
+      <div class="brief-h">${esc(t("pdf.victim"))}</div><p>${esc(mystery.victim)}</p>
     </div>
   </div>
 
@@ -202,11 +208,11 @@ function buildHtml(
   ${narrator}
 
   <div class="invite">
-    <div class="kicker">You are cordially summoned</div>
-    <h2>An Evening of Murder</h2>
+    <div class="kicker">${esc(t("pdf.inviteKicker"))}</div>
+    <h2>${esc(t("pdf.inviteTitle"))}</h2>
     <div class="seal">VERDICT</div>
-    <p class="teaser">You are invited to <strong>${esc(mystery.title)}</strong>.<br/>Come in character. Trust no one. Tell us nothing of what you know.</p>
-    <p style="font-family:'Special Elite',monospace;font-size:12px;letter-spacing:0.12em;">DATE _______________ &nbsp; TIME _______________ &nbsp; PLACE _______________</p>
+    <p class="teaser">${esc(t("pdf.inviteBody", { title: mystery.title }))}</p>
+    <p style="font-family:'Special Elite',monospace;font-size:12px;letter-spacing:0.12em;">${esc(t("pdf.dateLine"))}</p>
   </div>
 
   ${sheets}
